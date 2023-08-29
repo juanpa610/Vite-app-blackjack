@@ -1,5 +1,5 @@
 import _ from 'underscore';
-import  {crearDeck}  from "./useCases/create-deck";
+import { crearDeck, valorCarta, pedirCarta  } from "./useCases";
 
 let deck         = [],
     tipos      = ['C','D','H','S'],
@@ -14,8 +14,6 @@ const btnPedir   = document.querySelector('#btnPedir'),
 
 const divCartasJugadores =  document.querySelectorAll('.divCartas'),
       puntosHTML = document.querySelectorAll('small');
-
-
 
 const inicializarJuego = (numJugadores = 2) => {
   deck = crearDeck(tipos, especiales );
@@ -34,20 +32,14 @@ const inicializarJuego = (numJugadores = 2) => {
   btnDetener.disabled = false;
 }
 
-const pedirCarta = () => {
-    if ( deck.length === 0 ) {
-        throw 'No hay cartas en el deck';
-    }
-    return deck.pop();
-}
-
-const valorCarta = ( carta ) => {
-    const valor = carta.substring(0, carta.length - 1);
-    return ( isNaN( valor ) ) ? 
-            ( valor === 'A' ) ? 11 : 10
-            : valor * 1;
-}
-
+/**
+ * 
+ * Se acumulan los puntos del jugador 
+ * 
+ * @param {String} carta 
+ * @param {Number} turno 
+ * @returns se retorna los puntos de cada jugador 
+ */
 const acumularPuntosJugador = (carta , turno ) => {
     puntosJugadores[turno] = puntosJugadores[turno] + valorCarta( carta );
     puntosHTML[turno].innerText = puntosJugadores[turno];
@@ -82,7 +74,7 @@ const determinarGanador = () => {
 const turnoComputadora = ( puntosMinimos ) => {
     let puntosComputadora = 0;
     do {
-        const carta = pedirCarta();
+        const carta = pedirCarta(deck);
         puntosComputadora=+ acumularPuntosJugador(carta, 1);
         crearCarta(carta, 1);
     } while(  (puntosComputadora < puntosMinimos)  && (puntosMinimos <= 21 ) );
@@ -90,7 +82,7 @@ const turnoComputadora = ( puntosMinimos ) => {
 }
 
 btnPedir.addEventListener('click', () => {
-    const carta = pedirCarta();
+    const carta = pedirCarta(deck);
     const puntosJugador = acumularPuntosJugador(carta, 0);
 
     crearCarta(carta, 0);
